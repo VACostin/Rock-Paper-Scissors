@@ -1,27 +1,57 @@
 function getComputerChoice() {
-  const ROCK_PAPER_SCIS = ["ROCK", "PAPER", "SCISSORS"];
-  const computer_roll = Math.floor(Math.random() * 3);
-  return ROCK_PAPER_SCIS[computer_roll];
+  const ROCK_PAPER_SCISSORS = ["ROCK", "PAPER", "SCISSORS"];
+  const computerRoll = Math.floor(Math.random() * ROCK_PAPER_SCISSORS.length);
+  return ROCK_PAPER_SCISSORS[computerRoll];
+}
+
+function updateResultText(playerSelection, computerSelection) {
+  return `Computer played: ${computerSelection}. Player played: ${playerSelection}`;
+}
+
+function updateScores(winner) {
+  if (winner === "player") {
+    playerScore++;
+  } else if (winner === "computer") {
+    computerScore++;
+  }
+}
+
+function resetScoresAndDisplays() {
+  playerScore = 0;
+  computerScore = 0;
+  playerDisplay.textContent = playerScore;
+  computerDisplay.textContent = computerScore;
+  whoWins.textContent = "";
+  computerVSplayer.textContent = "";
+}
+
+function checkGameOver() {
+  if (playerScore >= 5) {
+    alert("Player wins");
+    resetScoresAndDisplays();
+  } else if (computerScore >= 5) {
+    alert("Computer wins");
+    resetScoresAndDisplays();
+  }
 }
 
 function playRound(playerSelection) {
-  //I haven't done this for fancy reasons, I just want run through a switch and the ? : thing"
-  let computerSelection = getComputerChoice();
-  let result = playerSelection.localeCompare(computerSelection);
-  let resultText = "Computer played: " + computerSelection + ". Player played: " + playerSelection;
+  const computerSelection = getComputerChoice();
+  const resultText = updateResultText(playerSelection, computerSelection);
   computerVSplayer.textContent = resultText;
+
+  const result = playerSelection.localeCompare(computerSelection);
   switch (result) {
     case 0:
       return "tie";
     case 1:
-      return (playerSelection + computerSelection == "SCISSORSPAPER" ? "win" : "loss");
+      return playerSelection + computerSelection === "SCISSORSPAPER" ? "player" : "computer";
     case -1:
-      return (playerSelection + computerSelection == "PAPERSCISSORS" ? "loss" : "win");
+      return playerSelection + computerSelection === "PAPERSCISSORS" ? "computer" : "player";
   }
 }
 
 const buttons = document.querySelectorAll('button');
-
 let playerScore = 0;
 let computerScore = 0;
 const playerDisplay = document.getElementById("PlayerScore");
@@ -29,41 +59,25 @@ const computerDisplay = document.getElementById("MachineScore");
 const whoWins = document.getElementById("WhoWins");
 const computerVSplayer = document.getElementById("Result");
 
-buttons.forEach((button) => {
+function handleButtonClick(button) {
+  const playerChoice = button.innerText;
+  const winner = playRound(playerChoice);
 
-  // and for each one we add a 'click' listener
+  updateScores(winner);
+  playerDisplay.textContent = playerScore;
+  computerDisplay.textContent = computerScore;
+
+  if (playerScore === computerScore) {
+    whoWins.textContent = "It's a tie";
+  } else {
+    whoWins.textContent = `${winner.charAt(0).toUpperCase() + winner.slice(1)} Wins`;
+  }
+
+  checkGameOver();
+}
+
+buttons.forEach((button) => {
   button.addEventListener('click', () => {
-    let playerChoice = button.innerText;
-    let result = playRound(playerChoice);
-    switch (result) {
-      case "win": playerScore++;
-        playerDisplay.textContent = playerScore;
-        whoWins.textContent = "Player Wins";
-        if (playerScore >= 5) {
-          alert("Player wins");
-          playerScore = 0;
-          computerScore = 0;
-          playerDisplay.textContent = playerScore;
-          computerDisplay.textContent = computerScore;
-          whoWins.textContent = "";
-          computerVSplayer.textContent = "";
-        }
-        break;
-      case "loss": computerScore++;
-        computerDisplay.textContent = computerScore;
-        whoWins.textContent = "Computer Wins";
-        if (computerScore >= 5) {
-          alert("Computer wins");
-          playerScore = 0;
-          computerScore = 0;
-          playerDisplay.textContent = playerScore;
-          computerDisplay.textContent = computerScore;
-          whoWins.textContent = "";
-          computerVSplayer.textContent = "";
-        }
-        break;
-      default: whoWins.textContent = "It's a tie";
-        break;
-    }
+    handleButtonClick(button);
   });
 });
