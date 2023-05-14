@@ -1,0 +1,13 @@
+.Machine {
+  display:flex;
+}
+
+.Player {
+  display:flex;
+}
+
+
+.Container {
+  display:flex;
+  flex-direction: column;
+}
